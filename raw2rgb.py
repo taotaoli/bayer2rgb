@@ -31,13 +31,13 @@ def convertBayer2RGB(bayerFile, imgWidth, imgHeight, bitDeepth, bayerPattern):
 
     bayerIMG = bayerIMG_data.reshape(imgHeight, imgWidth, 1)
 
-    if bayerPattern == bayerFormat.BayerRGGB:
+    if bayerPattern == 'RGGB' or bayerPattern == 'rggb':
         rgbIMG = cv2.cvtColor(bayerIMG, cv2.COLOR_BayerRG2RGB)
-    elif bayerPattern == bayerFormat.BayerGRBG:
+    elif bayerPattern == 'GRBG' or bayerPattern == 'grbg':
         rgbIMG = cv2.cvtColor(bayerIMG, cv2.COLOR_BayerGR2RGB)
-    elif bayerPattern == bayerFormat.BayerGBRG:
+    elif bayerPattern == 'GBRG' or bayerPattern == 'gbrg':
         rgbIMG = cv2.cvtColor(bayerIMG, cv2.COLOR_BayerGB2RGB)
-    elif bayerPattern == bayerFormat.BayerBGGR:
+    elif bayerPattern == 'BGGR' or bayerPattern == 'bggr':
         rgbIMG = cv2.cvtColor(bayerIMG, cv2.COLOR_BayerBG2RGB)
     else:
         print("unsupport bayer format:", bayerPattern)
@@ -181,7 +181,7 @@ if "__main__" == __name__:
     parser.add_argument("--height", help="raw image height",
                         required=True, type=int)
     parser.add_argument(
-        "--pattern", help="raw image bayer pattern: [1:RGGB, 2:GRBG, 3:GBRG, 4:BGGR]", required=True, type=int)
+        "--pattern", help="raw image bayer pattern: [rggb/RGGB, grbg/GRBG, gbrg/GBRG, bggr/BGGR]", required=True, type=str)
     parser.add_argument(
         "--depth", help="raw image depth [8, 10, 12, 14, 16]", required=True, type=int)
     parser.add_argument(

@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import cv2
 import argparse
@@ -26,7 +27,7 @@ def convertBayer2RGB(bayerFile, imgWidth, imgHeight, bitDeepth, bayerPattern):
         bayerIMG_data = np.fromfile(bayerFile, dtype='uint8')
     else:
         bayerIMG_data = np.fromfile(bayerFile, dtype='uint16')
-    print("raw file size:", bayerIMG_data.size)
+    #print("raw file size:", bayerIMG_data.size)
 
     bayerIMG = bayerIMG_data.reshape(imgHeight, imgWidth, 1)
 
@@ -56,8 +57,8 @@ def convertBayer2RGB(bayerFile, imgWidth, imgHeight, bitDeepth, bayerPattern):
 
     cv2.imwrite(bayerFile[:-4]+'.png', rgbIMG)
 
-    showColorImg(bayerFile, rgbIMG)
-    closeWindows()
+    #showColorImg(bayerFile, rgbIMG)
+    # closeWindows()
 
 
 def convertBayer2GRAY(bayerFile, imgWidth, imgHeight, bitDeepth, bayerPattern, splitChannel):
@@ -67,7 +68,7 @@ def convertBayer2GRAY(bayerFile, imgWidth, imgHeight, bitDeepth, bayerPattern, s
     else:
         bayerIMG_data = np.fromfile(bayerFile, dtype='uint16')
         grayIMG = np.zeros([imgHeight, imgWidth, 3], dtype='uint16')
-    print("raw file size:", bayerIMG_data.size)
+    #print("raw file size:", bayerIMG_data.size)
 
     bayerIMG = bayerIMG_data.reshape(imgHeight, imgWidth, 1)
 
@@ -141,15 +142,40 @@ def convertBayer2GRAY(bayerFile, imgWidth, imgHeight, bitDeepth, bayerPattern, s
 
     cv2.imwrite(bayerFile[:-4]+'_GRAY.png', grayIMG)
 
-    showColorImg(bayerFile, grayIMG)
-    closeWindows()
+    #showColorImg(bayerFile, grayIMG)
+    # closeWindows()
+
+
+def ProcSingleFile(rawFile, img_width, img_height,
+                   rawDepth, bayerPattern, splitFlag):
+    #(path, rawFile) = os.path.split(raw_name)
+    print("process ", rawFile, "...")
+    if args.gray == 1:
+        convertBayer2GRAY(rawFile, img_width, img_height,
+                          rawDepth, bayerPattern, splitFlag)
+    else:
+        convertBayer2RGB(rawFile, img_width, img_height,
+                         rawDepth, bayerPattern)
+
+
+def ProcPath(path, img_width, img_height,
+             rawDepth, bayerPattern, splitFlag):
+    file_list = os.listdir(path)
+    for f in file_list:
+        f_lower = f.lower()
+        if f_lower.endswith('.raw'):
+            raw_name = '%s\%s' % (path, f)
+            ProcSingleFile(raw_name, img_width, img_height,
+                           rawDepth, bayerPattern, splitFlag)
 
 
 if "__main__" == __name__:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "--rawfile", help="input raw file name", required=True, type=str)
+        "--path", help="input raw path", required=False, type=str)
+    parser.add_argument(
+        "--rawfile", help="input raw file name", required=False, type=str)
     parser.add_argument("--width", help="raw image width",
                         required=True, type=int)
     parser.add_argument("--height", help="raw image height",
@@ -165,6 +191,7 @@ if "__main__" == __name__:
 
     args = parser.parse_args()
 
+    rawPath = args.path
     rawFile = args.rawfile
     img_width = args.width
     img_height = args.height
@@ -172,9 +199,11 @@ if "__main__" == __name__:
     rawDepth = args.depth
     splitFlag = args.split
 
-    if args.gray == 1:
-        convertBayer2GRAY(rawFile, img_width, img_height,
-                          rawDepth, bayerPattern, splitFlag)
+    if rawPath is not None:
+        ProcPath(rawPath, img_width, img_height,
+                 rawDepth, bayerPattern, splitFlag)
+    elif rawFile is not None:
+        ProcSingleFile(rawFile, img_width, img_height,
+                       rawDepth, bayerPattern, splitFlag)
     else:
-        convertBayer2RGB(rawFile, img_width, img_height,
-                         rawDepth, bayerPattern)
+        print("parameters wrong!!! no path or file")

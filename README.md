@@ -3,12 +3,13 @@ bayer2rgb with python
 
 
 python .\raw2rgb.py -h
-usage: raw2rgb.py [-h] --rawfile RAWFILE --width WIDTH --height HEIGHT
-                  --pattern PATTERN --depth DEPTH [--gray GRAY]
-                  [--split SPLIT]
+usage: raw2rgb.py [-h] [--path PATH] [--rawfile RAWFILE] --width WIDTH
+                  --height HEIGHT --pattern PATTERN --depth DEPTH
+                  [--gray GRAY] [--split SPLIT]
 
 optional arguments:
   -h, --help         show this help message and exit
+  --path PATH        input raw path
   --rawfile RAWFILE  input raw file name
   --width WIDTH      raw image width
   --height HEIGHT    raw image height
@@ -18,5 +19,6 @@ optional arguments:
   --split SPLIT      split bayer channel
   
 
-test:
-python .\raw2rgb.py --rawfile raw8_1600x1200_RGGB.raw --width 1600 --height 1200 --pattern 1 --depth 8 [--gray 1] [--split 1]
+eg.
+(1)single python .\raw2rgb.py --rawfile raw8_1600x1200_RGGB.raw --width 1600 --height 1200 --pattern 1 --depth 8 [--gray 1] [--split 1]
+(2)batch python .\raw2rgb.py --path D:\bayer2rgb --width 1600 --height 1200 --pattern 1 --depth 8 [--gray 1] [--split 1]

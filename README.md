@@ -18,5 +18,5 @@ optional arguments:
   --split SPLIT      split bayer channel
   
 
-eg.
+test:
 python .\raw2rgb.py --rawfile raw8_1600x1200_RGGB.raw --width 1600 --height 1200 --pattern 1 --depth 8 [--gray 1] [--split 1]

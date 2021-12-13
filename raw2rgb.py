@@ -60,37 +60,88 @@ def convertBayer2RGB(bayerFile, imgWidth, imgHeight, bitDeepth, bayerPattern):
     closeWindows()
 
 
-def convertBayer2GRAY(bayerFile, imgWidth, imgHeight, bitDeepth, bayerPattern):
+def convertBayer2GRAY(bayerFile, imgWidth, imgHeight, bitDeepth, bayerPattern, splitChannel):
     if bitDeepth == 8:
         bayerIMG_data = np.fromfile(bayerFile, dtype='uint8')
+        grayIMG = np.zeros([imgHeight, imgWidth, 3], dtype='uint8')
     else:
         bayerIMG_data = np.fromfile(bayerFile, dtype='uint16')
+        grayIMG = np.zeros([imgHeight, imgWidth, 3], dtype='uint16')
     print("raw file size:", bayerIMG_data.size)
 
     bayerIMG = bayerIMG_data.reshape(imgHeight, imgWidth, 1)
 
-    rgbIMG = np.zeros([imgHeight, imgWidth, 3])
-
     for i in range(0, imgHeight, 1):
         for j in range(0, imgWidth, 1):
-            rgbIMG[i][j][0] = rgbIMG[i][j][1] = rgbIMG[i][j][2] = bayerIMG[i][j]
+            grayIMG[i][j][0] = grayIMG[i][j][1] = grayIMG[i][j][2] = bayerIMG[i][j]
 
     if bitDeepth == 8:
-        rgbIMG = np.uint8(rgbIMG)  # raw8
+        grayIMG = np.uint8(grayIMG)  # raw8
     elif bitDeepth == 10:
-        rgbIMG = np.uint16(rgbIMG*64)  # raw10
+        grayIMG = np.uint16(grayIMG*64)  # raw10
     elif bitDeepth == 12:
-        rgbIMG = np.uint16(rgbIMG*16)  # raw12
+        grayIMG = np.uint16(grayIMG*16)  # raw12
     elif bitDeepth == 14:
-        rgbIMG = np.uint16(rgbIMG*4)  # raw14
+        grayIMG = np.uint16(grayIMG*4)  # raw14
     elif bitDeepth == 16:
-        rgbIMG = np.uint16(rgbIMG)  # raw16
+        grayIMG = np.uint16(grayIMG)  # raw16
     else:
         print("unsupport bayer bitDeepth:", bitDeepth)
 
-    cv2.imwrite(bayerFile[:-4]+'_GRAY.png', rgbIMG)
+    if splitChannel == 1:
+        splitWidth = imgWidth // 2
+        splitHeight = imgHeight // 2
+        if bitDeepth == 8:
+            grayIMGch1 = np.zeros([splitHeight, splitWidth, 3], dtype='uint8')
+            grayIMGch2 = np.zeros([splitHeight, splitWidth, 3], dtype='uint8')
+            grayIMGch3 = np.zeros([splitHeight, splitWidth, 3], dtype='uint8')
+            grayIMGch4 = np.zeros([splitHeight, splitWidth, 3], dtype='uint8')
+        else:
+            grayIMGch1 = np.zeros([splitHeight, splitWidth, 3], dtype='uint16')
+            grayIMGch2 = np.zeros([splitHeight, splitWidth, 3], dtype='uint16')
+            grayIMGch3 = np.zeros([splitHeight, splitWidth, 3], dtype='uint16')
+            grayIMGch4 = np.zeros([splitHeight, splitWidth, 3], dtype='uint16')
 
-    showColorImg(bayerFile, rgbIMG)
+        posX = 0
+        posY = 0
+        for i in range(0, (imgHeight-1), 2):  # first pixel
+            posY = 0
+            for j in range(0, (imgWidth-1), 2):
+                grayIMGch1[posX][posY][0] = grayIMGch1[posX][posY][1] = grayIMGch1[posX][posY][2] = grayIMG[i][j][0]
+                posY = posY + 1
+            posX = posX + 1
+        cv2.imwrite(bayerFile[:-4]+'_GRAY_ch1.png', grayIMGch1)
+        posX = 0
+        posY = 0
+        for i in range(0, (imgHeight-1), 2):  # second pixel
+            posY = 0
+            for j in range(1, (imgWidth-1), 2):
+                grayIMGch2[posX][posY][0] = grayIMGch2[posX][posY][1] = grayIMGch2[posX][posY][2] = grayIMG[i][j][0]
+                posY = posY + 1
+            posX = posX + 1
+        cv2.imwrite(bayerFile[:-4]+'_GRAY_ch2.png', grayIMGch2)
+        posX = 0
+        posY = 0
+        for i in range(1, (imgHeight-1), 2):  # third pixel
+            posY = 0
+            for j in range(0, (imgWidth-1), 2):
+                grayIMGch3[posX][posY][0] = grayIMGch3[posX][posY][1] = grayIMGch3[posX][posY][2] = grayIMG[i][j][0]
+                posY = posY + 1
+            posX = posX + 1
+        cv2.imwrite(bayerFile[:-4]+'_GRAY_ch3.png', grayIMGch3)
+        posX = 0
+        posY = 0
+        for i in range(1, (imgHeight-1), 2):  # fourth pixel
+            posY = 0
+            for j in range(1, (imgWidth-1), 2):
+                grayIMGch4[posX][posY][0] = grayIMGch4[posX][posY][1] = grayIMGch4[posX][posY][2] = grayIMG[i][j][0]
+                posY = posY + 1
+            posX = posX + 1
+        cv2.imwrite(bayerFile[:-4]+'_GRAY_ch4.png', grayIMGch4)
+
+    cv2.imwrite(bayerFile[:-4]+'_GRAY.png', grayIMG)
+
+    showColorImg(bayerFile, grayIMG)
     closeWindows()
 
 
@@ -108,7 +159,9 @@ if "__main__" == __name__:
     parser.add_argument(
         "--depth", help="raw image depth [8, 10, 12, 14, 16]", required=True, type=int)
     parser.add_argument(
-        "--gray", help="show gray raw image", required=False, type=int)
+        "--gray", help="show gray raw image", required=False, type=bool)
+    parser.add_argument(
+        "--split", help="split bayer channel", required=False, type=bool)
 
     args = parser.parse_args()
 
@@ -117,9 +170,11 @@ if "__main__" == __name__:
     img_height = args.height
     bayerPattern = args.pattern
     rawDepth = args.depth
+    splitFlag = args.split
+
     if args.gray == 1:
         convertBayer2GRAY(rawFile, img_width, img_height,
-                          rawDepth, bayerPattern)
+                          rawDepth, bayerPattern, splitFlag)
     else:
         convertBayer2RGB(rawFile, img_width, img_height,
                          rawDepth, bayerPattern)

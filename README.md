@@ -5,22 +5,22 @@ bayer2rgb with python
 
 usage
 ------------
-python .\raw2rgb.py -h
-usage: raw2rgb.py [-h] [--path PATH] [--rawfile RAWFILE] --width WIDTH
-                  --height HEIGHT --pattern PATTERN --depth DEPTH
-                  [--gray GRAY] [--split SPLIT]
+  python .\raw2rgb.py -h
+  usage: raw2rgb.py [-h] [--path PATH] [--rawfile RAWFILE] --width WIDTH
+                    --height HEIGHT --pattern PATTERN --depth DEPTH
+                    [--gray GRAY] [--split SPLIT]
 
-optional arguments:
-  -h, --help         show this help message and exit
-  --path PATH        input raw path
-  --rawfile RAWFILE  input raw file name
-  --width WIDTH      raw image width
-  --height HEIGHT    raw image height
-  --pattern PATTERN  raw image bayer pattern: [rggb/RGGB, grbg/GRBG,
-                     gbrg/GBRG, bggr/BGGR]
-  --depth DEPTH      raw image depth [8, 10, 12, 14, 16]
-  --gray GRAY        show gray raw image
-  --split SPLIT      split bayer channel
+  optional arguments:
+    -h, --help         show this help message and exit
+    --path PATH        input raw path
+    --rawfile RAWFILE  input raw file name
+    --width WIDTH      raw image width
+    --height HEIGHT    raw image height
+    --pattern PATTERN  raw image bayer pattern: [rggb/RGGB, grbg/GRBG,
+                       gbrg/GBRG, bggr/BGGR]
+    --depth DEPTH      raw image depth [8, 10, 12, 14, 16]
+    --gray GRAY        show gray raw image
+    --split SPLIT      split bayer channel
   
 
 eg.
